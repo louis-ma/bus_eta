@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+
+<html lang="en">
+    <head>
+        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
+        <link href="/static/styles.css" rel="stylesheet">
+        <title>Real-time Buses</title>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                fetch("https://data.etabus.gov.hk/v1/transport/kmb/route/3D/outbound/1")
+                .then(response => response.json())
+                .then(JSON_data => {
+                    let route = JSON_data.data.route;
+                    let bound = JSON_data.data.bound;
+                    let orig_en = JSON_data.data.orig_en;
+                    let dest_en = JSON_data.data.dest_en;
+                    console.log(route, bound, orig_en, dest_en)
+
+                    // Update routes on web
+
+                    let li_route = document.createElement('li');
+                    li_route.innerHTML = route;
+
+                    document.querySelector('#routes').append(li_route)
+                })
+
+                // Report if error
+                .catch(error => {
+                    console.log('Error:', error);
+                });
+            });
+        </script>
+    </head>
+    <body>
+        <h1>Real-time buses</h1>
+        <ul id="routes">
+        </ul>
+    </body>
+</html>
