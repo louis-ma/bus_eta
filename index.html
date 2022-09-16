@@ -2,26 +2,33 @@
 
 <html lang="en">
     <head>
-        <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500&display=swap" rel="stylesheet">
-        <link href="/static/styles.css" rel="stylesheet">
+        <meta charset="utf-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
         <title>Real-time Buses</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
+
         <script>
+            const routesTemplate = document.querySelector("[date-routes-template]")
+
+
             document.addEventListener('DOMContentLoaded', function() {
-                fetch("https://data.etabus.gov.hk/v1/transport/kmb/route/3D/outbound/1")
+                fetch("https://data.etabus.gov.hk/v1/transport/kmb/route/")
                 .then(response => response.json())
                 .then(JSON_data => {
-                    let route = JSON_data.data.route;
-                    let bound = JSON_data.data.bound;
-                    let orig_en = JSON_data.data.orig_en;
-                    let dest_en = JSON_data.data.dest_en;
-                    console.log(route, bound, orig_en, dest_en)
+                    JSON_data.data.forEach(function(JSON_file) {
+                        let route = JSON_file.route;
+                        let bound = JSON_file.bound;
+                        let orig_en = JSON_file.orig_en;
+                        let dest_en = JSON_file.dest_en;
+                        console.log(route, bound, orig_en, dest_en);
 
-                    // Update routes on web
+                        // Update routes on web 
 
-                    let li_route = document.createElement('li');
-                    li_route.innerHTML = route;
+                        let li_route = document.createElement('li');
+                        li_route.innerHTML = `${route}: ${orig_en} &#9193 ${dest_en}`;
 
-                    document.querySelector('#routes').append(li_route)
+                        document.querySelector('#routes').append(li_route);
+                    })
                 })
 
                 // Report if error
@@ -29,11 +36,47 @@
                     console.log('Error:', error);
                 });
             });
+
         </script>
     </head>
     <body>
         <h1>Real-time buses</h1>
-        <ul id="routes">
-        </ul>
+        <div id="search_div">
+            <input type="text" id="search-bar" placeholder="Type the route here">
+        </div>
+        
+        <div id="routes_div">
+            <ul id="routes">
+                <template data-routes-template>
+                    <li></li>
+                </template>
+            </ul>
+        </div>
+
+        <script>
+
+            // Impletement search bar
+            document.querySelector('#search-bar').addEventListener('input', filterRoute);
+
+            function filterRoute(){
+                const searchInputv = document.querySelector('#search-bar');
+                const filter = seachInputv.value.toLowerCase();
+                const routes = document.querySelectorAll('li');
+
+                routes.forEach((route) =>{
+                    let text = routes.textContent;
+                    if(text.toLowerCase.includes(filter.toLowerCase())){
+                        item.style.display = '';
+                    }
+                    else{
+                        item.style.display = 'none';
+                    }
+                });
+            }
+
+        </script>
+
+
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js" integrity="sha384-A3rJD856KowSb7dwlZdYEkO39Gagi7vIsF0jrRAoQmDKKtQBHUuLZ9AsSv4jD4Xa" crossorigin="anonymous"></script>
     </body>
 </html>
