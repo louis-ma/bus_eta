@@ -8,24 +8,22 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-gH2yIJqKdNHPEq0n4Mqa/HGKIhSkIHeL5AyhkYV8i59U5AR6csBvApHHNl/vI1Bx" crossorigin="anonymous">
 
         <script>
-            const routesTemplate = document.querySelector("[date-routes-template]")
-
-
             document.addEventListener('DOMContentLoaded', function() {
+                // Load routes from JSON
                 fetch("https://data.etabus.gov.hk/v1/transport/kmb/route/")
                 .then(response => response.json())
                 .then(JSON_data => {
                     JSON_data.data.forEach(function(JSON_file) {
                         let route = JSON_file.route;
-                        // the var bound can be deleted as it is useless?
                         let bound = JSON_file.bound;
                         let service_type = JSON_file.service_type;
                         let orig_en = JSON_file.orig_en;
                         let dest_en = JSON_file.dest_en;
 
-                        // Update routes on web 
+                        // Print routes on web 
                         let li_route = document.createElement('li');
                         li_route.className = 'route'
+                        li_route.setAttribute('id',`${route}_${bound}_${service_type}`)
 
                         if (service_type == '1'){
                             service_type_text = 'Normal Route'
@@ -33,21 +31,55 @@
                         else {
                             service_type_text = 'Peak Hour or Special Route'
                         }
-                        li_route.innerHTML = `${route}: ${orig_en} &#9193 ${dest_en} | Service Type[${service_type}]: ${service_type_text}`;
+                        li_route.innerHTML = `${route}: ${orig_en} &#9193 ${dest_en} | Service Type[${service_type}]: ${service_type_text} | bound: ${bound}`;
                         document.querySelector('#routes').append(li_route);
-                    })
+                })
 
                 // Click to search bus stops 
-                document.querySelectorAll('.route').forEach(function(route) {
-                    route.addEventListener('click', function(){
-                        // Create a unorder list of bus stops 
-                        const bus_stops = document.createElement('ul')
-                        let bus_stop = document.createElement('li');
-                        bus_stop.innerHTML = 'bus stop 1'
-                        bus_stops.append(bus_stop)
+                document.querySelectorAll('.route').forEach(function(route_HTML) {
+                    route_HTML.addEventListener('click', function(){
 
-                        // Append the unorder list of bus stops under the route 
-                        route.append(bus_stops)
+                        document.querySelectorAll('.stop').forEach(function(stop_HTML){
+                            stop_HTML.remove();
+                        })
+
+                        // Get clicked route code 
+                        let route = route_HTML.id.split("_")[0];
+
+                        // Get direction 
+                        let direction = route_HTML.id.split("_")[1];
+                        if (direction == 'O') {
+                            direction = 'outbound'
+                        }
+                        else {
+                            direction = 'inbound'
+                        }
+
+                        // Get service_type 
+                        let service_type = route_HTML.id.split("_")[2];
+
+                        // Fetch bus stop id from JSON
+                        let stops = document.createElement('ul');
+                        fetch(`https://data.etabus.gov.hk/v1/transport/kmb/route-stop/${route}/${direction}/${service_type}`)
+                        .then(response => response.json())
+                        .then(JSON_data => {
+                            JSON_data.data.forEach(function(JSON_file){
+                                let stop_id = JSON_file.stop
+                                // Fetch bus stop name from JSON
+                                fetch(`https://data.etabus.gov.hk/v1/transport/kmb/stop/${stop_id}`)
+                                .then(response => response.json())
+                                .then(JSON_data => {
+                                    // Create a stop of html li element, id, its innerHTML
+                                    let stop = document.createElement('li');
+                                    stop.className = 'stop';
+                                    stop.setAttribute('id',`${stop_id}`);
+                                    stop.innerHTML = JSON_data.data.name_en;
+                                    // Append unordered list of stops to corresponding route 
+                                    stops.append(stop);
+                                })
+                            })
+                            route_HTML.append(stops);
+                        })
                     })
                 });
             })
@@ -56,9 +88,6 @@
                 .catch(error => {
                     console.log('Error:', error);
                 });
-
-                // Click to search for stops 
-                
 
                 // Impletement search bar
                 document.querySelector('#search-bar').addEventListener('input', filterRoute);
@@ -75,13 +104,7 @@
                         }
                     });
                 }
-
-                
-
             });
-
-            
-
         </script>
     </head>
     <body>
