@@ -9,35 +9,32 @@
 
         <script>
             document.addEventListener('DOMContentLoaded', function() {
-                // Impletement search bar
-                document.querySelector('#search-bar').addEventListener('input', filterRoute);
-
-                function filterRoute(){
-                    const searchInputValue = document.querySelector('#search-bar').value.toLowerCase();
-                    const routes = document.querySelectorAll('.route');
-                    console.log(routes)
-                    document.querySelectorAll('.route').forEach(function(route){
-                        if(route.innerHTML.toLowerCase().includes(searchInputValue)){
-                            route.style.display = '';
-                        }
-                        else{
-                            route.style.display = 'none';
-                        }
-                    });
-                }
+                document.querySelectorAll('.route').forEach(function(route_li) {
+                    route_li.addEventListener('click', function(){
+                        console.log('hello world')
+                    })
+                });
             });
+
+
         </script>
-        
+
     </head>
     <body>
         <h1>Real-time buses</h1>
         <div id="search_div">
             <input type="text" id="search-bar" placeholder="Type the route here">
         </div>
+        <p class = 'paragraph'>hello, world</p>
         
         <div id="routes_div">
             <ul>
                 <li class="route">1</li>
+                <ol>
+                    <li>bus stop 1</li>
+                    <li>bus stop 3</li>
+                    <li>bus stop 2</li>
+                </ol>
                 <li class="route">1A</li>
                 <li class="route">1B</li>
                 <li class="route">1C</li>
