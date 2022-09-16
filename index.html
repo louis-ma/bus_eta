@@ -25,6 +25,7 @@
                         // Update routes on web 
 
                         let li_route = document.createElement('li');
+                        li_route.className = 'route'
                         li_route.innerHTML = `${route}: ${orig_en} &#9193 ${dest_en}`;
 
                         document.querySelector('#routes').append(li_route);
@@ -35,6 +36,23 @@
                 .catch(error => {
                     console.log('Error:', error);
                 });
+
+                // Impletement search bar
+                document.querySelector('#search-bar').addEventListener('input', filterRoute);
+
+                function filterRoute(){
+                    const searchInputValue = document.querySelector('#search-bar').value.toLowerCase();
+                    const routes = document.querySelectorAll('.route');
+                    console.log(routes)
+                    document.querySelectorAll('.route').forEach(function(route){
+                        if(route.innerHTML.toLowerCase().includes(searchInputValue)){
+                            route.style.display = '';
+                        }
+                        else{
+                            route.style.display = 'none';
+                        }
+                    });
+                }
             });
 
         </script>
